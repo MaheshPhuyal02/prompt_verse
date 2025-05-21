@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LogIn, User, Lock, Mail, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react';
+import {useAuth} from "../api/auth_provider.jsx";
+
 
 const LoginPage = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -12,6 +15,16 @@ const LoginPage = () => {
     });
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+
+    const navigate = useNavigate();
+    const { login, signup, isLoggedIn } = useAuth();
+
+    // Redirect if already logged in
+    useEffect(() => {
+        if (isLoggedIn()) {
+            navigate('/dashboard');
+        }
+    }, [isLoggedIn, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -68,13 +81,23 @@ const LoginPage = () => {
         setIsLoading(true);
 
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            let success;
 
-            // This would be where you'd handle the login/signup logic
-            console.log('Form submitted:', formData);
+            if (isLogin) {
+                // Handle login
+                success = await login(formData.email, formData.password);
+            } else {
+                // Handle signup
+                success = await signup(formData.name, formData.email, formData.password);
+            }
 
-            // Redirect to dashboard or other page on success
+            if (success) {
+                navigate('/dashboard');
+            } else {
+                setErrors({
+                    general: isLogin ? 'Invalid email or password.' : 'Failed to create account.'
+                });
+            }
         } catch (error) {
             setErrors({
                 general: 'An error occurred. Please try again.'

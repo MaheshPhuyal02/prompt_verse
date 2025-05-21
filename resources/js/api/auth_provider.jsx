@@ -1,4 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { apiBase } from "./api_list.js";
 
 // Create AuthContext
 const AuthContext = createContext(null);
@@ -20,13 +22,15 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             // API call to validate credentials and get authentication key
-            const response = await fetch("https://api.example.com/login", {
+            const response = await fetch(apiBase + "/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Accept": "application/json",
                 },
                 body: JSON.stringify({ email, password }),
             });
+            console.log("Login failed:", response);
 
             if (!response.ok) {
                 throw new Error("Login failed");
@@ -54,7 +58,7 @@ export const AuthProvider = ({ children }) => {
     const signup = async (name, email, password) => {
         try {
             // API call to create a new user
-            const response = await fetch("https://api.example.com/signup", {
+            const response = await fetch(apiBase  + "/signup", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -84,6 +88,28 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const profile = async () => {
+        try {
+            // API call to get user profile
+            const response = await fetch(apiBase + "/profile", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user.apiKey}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Profile fetch failed");
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Profile fetch error:", error);
+            return null;
+        }
+    }
     // Logout function
     const logout = () => {
         setUser(null);
@@ -104,6 +130,7 @@ export const AuthProvider = ({ children }) => {
     const value = {
         user,
         login,
+        profile,
         signup,
         logout,
         isLoggedIn,

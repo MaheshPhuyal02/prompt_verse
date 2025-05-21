@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { User, Clock, Calendar, DollarSign, ShoppingBag, Loader, FileText, Tag } from 'lucide-react';
+import {useAuth} from "../api/auth_provider.jsx";
 
 const ProfilePage = () => {
     // Sample user data
     const [user, setUser] = useState({
-        id: 'current-user-id',
-        name: 'Alex Johnson',
-        email: 'alex@example.com',
-        joined: 'January 15, 2025',
-        profileImage: '/api/placeholder/100/100'
+
     });
+    const { profile } = useAuth();
+
+
 
     const [boughtPrompts, setBoughtPrompts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('purchases');
 
-    useEffect(() => {
+    useEffect(async () => {
+
+        setUser(
+            await profile()
+        )
+
         const loadUserPrompts = async () => {
             try {
                 // Simulate API call
