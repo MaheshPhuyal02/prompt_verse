@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             // API call to validate credentials and get authentication key
+
             const response = await fetch(apiBase + "/login", {
                 method: "POST",
                 headers: {
@@ -91,8 +92,8 @@ export const AuthProvider = ({ children }) => {
     const profile = async () => {
         try {
             // API call to get user profile
-            const response = await fetch(apiBase + "/profile", {
-                method: "GET",
+            const response = await fetch(apiBase + "/user", {
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${user.apiKey}`,

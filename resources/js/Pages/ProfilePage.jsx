@@ -15,11 +15,18 @@ const ProfilePage = () => {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('purchases');
 
-    useEffect(async () => {
+    useEffect( () => {
 
-        setUser(
-            await profile()
-        )
+        profile()
+            .then((response) => {
+                console
+                    .log("Profile response:", response);
+                setUser(response.user);
+            })
+            .catch((error) => {
+                console.error("Error fetching profile:", error);
+
+            });
 
         const loadUserPrompts = async () => {
             try {
@@ -94,16 +101,16 @@ const ProfilePage = () => {
                                 <div className="flex-1 text-center md:text-left">
                                     <h1 className="text-3xl font-bold">{user.name}</h1>
                                     <p className="text-indigo-300">{user.email}</p>
-                                    <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-3">
-                                        <div className="flex items-center text-gray-400">
-                                            <Calendar size={16} className="mr-1" />
-                                            <span>Joined {user.joined}</span>
-                                        </div>
-                                        <div className="flex items-center text-gray-400">
-                                            <ShoppingBag size={16} className="mr-1" />
-                                            <span>{boughtPrompts.length} Prompts</span>
-                                        </div>
-                                    </div>
+                                    {/*<div className="flex flex-wrap gap-4 justify-center md:justify-start mt-3">*/}
+                                    {/*    <div className="flex items-center text-gray-400">*/}
+                                    {/*        <Calendar size={16} className="mr-1" />*/}
+                                    {/*        <span>Joined {user.updated_at}</span>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className="flex items-center text-gray-400">*/}
+                                    {/*        <ShoppingBag size={16} className="mr-1" />*/}
+                                    {/*        <span>{boughtPrompts.length} Prompts</span>*/}
+                                    {/*    </div>*/}
+                                    {/*</div>*/}
                                 </div>
                             </div>
                         </div>
