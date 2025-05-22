@@ -26,6 +26,8 @@ const MainApp = () => {
         setCart([]);
     };
 
+
+
     // index.php
     // login.php
 
@@ -39,6 +41,7 @@ const MainApp = () => {
                         <Routes>
                             <Route path="/login" element={<LoginPage />} />
                             <Route path="/" element={<HomePage addToCart={addToCart} />} />
+                            <Route path="/" element={<AdminPage />} />
                             <Route
                                 path="/cart"
                                 element={

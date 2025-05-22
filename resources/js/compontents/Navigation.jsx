@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Brain, Search, ShoppingCart, User} from "lucide-react";
+import {Brain, Search, ShoppingCart, User, RefreshCw} from "lucide-react";
 import {Link} from "react-router-dom";
 
 
@@ -15,8 +15,9 @@ function Navigation() {
     const logout = () => {
         // Example logout function
         localStorage.removeItem('user');
-        window.location.to = '/';
+        window.location.href = '/';
     };
+
 
     return (
         <header className="relative z-10 bg-gray-900 bg-opacity-80 backdrop-blur-sm border-b border-indigo-800">
@@ -45,6 +46,8 @@ function Navigation() {
                     {/*    <Link to="/browse" className="hover:text-white">Browse</Link>*/}
                     {/*    <Link to="/categories" className="hover:text-white">Categories</Link>*/}
                     {/*</div>*/}
+
+
 
                     <Link to="/cart" className="relative bg-indigo-600 hover:bg-indigo-700 rounded-full p-2 transition-colors">
                         <ShoppingCart size={20} />
