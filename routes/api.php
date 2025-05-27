@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\PromptController;
 use App\Http\Controllers\PurchaseController;
@@ -28,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/file/upload', [FileController::class, 'saveFile']);
     Route::get('/file/{fileId}', [FileController::class, 'getFile']);
     Route::apiResource('purchases', PurchaseController::class);
+    Route::apiResource('carts', CartController::class);
 });
 
 
