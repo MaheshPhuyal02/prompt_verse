@@ -288,7 +288,7 @@
                         <i class="fas fa-cloud-upload-alt text-5xl text-gray-400 mb-4"></i>
                         <p class="text-xl text-gray-300 mb-2">Drag & drop files here, or click to browse</p>
                         <p class="text-gray-500">Support for multiple file types</p>
-                        <input type="file" id="fileUpload" multiple class="hidden">
+                        <input type="file" id="fileUpload" class="hidden">
                     </div>
                 </div>
 
@@ -457,7 +457,7 @@
         }
 
         if (data && Object.keys(data).length > 0) {
-            config.body = JSON.stringify(data);
+            config.body = data;
         }
 
         try {
@@ -553,25 +553,30 @@
             // For now, we'll just show success since the exact API endpoint structure isn't clear
             // upload file first
 
+            //  const myHeaders = new Headers();
+
             if (!title || !content || !category) {
                 throw new Error('All fields are required');
             }
 
-            console.log("Upload :: " );
+            const fileInput = document.getElementById('promptImage');
+            const file = fileInput.files[0];
+            console.log("Upload :: " + title + " " + content + " " + category + " FILE :: " + file);
+
 
             const uploadForm = new FormData()
-            uploadForm.append("file", fileUpload.files[0]);
+            uploadForm.append("file", file);
 
             const uploadFile
-                = apiCall("/file/upload",
+                = await apiCall("/file/upload",
                 {
                     "method": "post"
                 },
-
+                uploadForm
             )
-            console.log("Uploaded :: " );
+            console.log("Uploaded :: ");
 
-            if (uploadFile) {
+            if (uploadFile.file_id) {
                 console.log('File uploaded successfully');
 
                 const formData = new FormData();
@@ -586,6 +591,7 @@
                 formData.append('title', title);
                 formData.append('description', content);
                 formData.append('category', category);
+                formData.append('image', uploadFile.file_id);
                 formData.append('popular', 1);
 
 
@@ -748,6 +754,21 @@
         }
     }
 
+    // Delete prompt
+    async function deletePrompt(promptId) {
+
+        if (!confirm('Are you sure you want to delete this prompt?')) return;
+
+        // http://127.0.0.1:8000/api/prompts/1
+        try {
+            await apiCall(`/prompts/${promptId}`, {method: 'DELETE'});
+            await loadPrompts(); // Reload the prompts list
+            alert('Prompt deleted successfully');
+        } catch (error) {
+            showError('Failed to delete prompt');
+        }
+    }
+
     // Load prompts data
     async function loadPrompts() {
         try {
@@ -759,8 +780,8 @@
                     <td class="px-6 py-4 text-sm text-gray-300">${prompt.category}</td>
                     <td class="px-6 py-4 text-sm text-gray-300">${prompt.status}</td>
                     <td class="px-6 py-4 text-sm">
-                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs mr-2 transition duration-200">Edit</button>
-                        <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs transition duration-200">Delete</button>
+                            <button
+            onclick="deletePrompt(${prompt.id})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs transition duration-200">Delete</button>
                     </td>
                 </tr>
             `).join('');

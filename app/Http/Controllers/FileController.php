@@ -19,7 +19,7 @@ class FileController extends Controller
     {
         // Validate file is present in the request
         $request->validate([
-            'file' => 'required|file|max:10240', // max 10MB
+            'file' => 'required|file|max:100240', // max 10MB
         ]);
 
         $file = $request->file('file');
