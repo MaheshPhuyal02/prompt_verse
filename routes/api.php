@@ -27,11 +27,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/user', [AuthController::class, 'user']);
     Route::post('/file/upload', [FileController::class, 'saveFile']);
-    Route::get('/file/{fileId}', [FileController::class, 'getFile']);
     Route::apiResource('purchases', PurchaseController::class);
     Route::apiResource('carts', CartController::class);
 });
 
+Route::get('/file/{fileId}', [FileController::class, 'getFile']);
 
 Route::apiResource('prompts', PromptController::class);
 

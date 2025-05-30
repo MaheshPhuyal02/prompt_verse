@@ -7,6 +7,7 @@ import ProfilePage from "./Pages/ProfilePage.jsx";
 import AdminPage from "./Pages/AdminPage.jsx";
 import LoginPage from "./Pages/LoginPage.jsx";
 import Navigation from "./compontents/Navigation.jsx";
+import {isAuthenticated} from "./api/api.js";
 
 
 // Navigation component with authentication status
@@ -15,7 +16,20 @@ const MainApp = () => {
     const [cart, setCart] = React.useState([]);
 
     const addToCart = (prompt) => {
-        setCart(prevCart => [...prevCart, prompt]);
+        if(isAuthenticated()){
+            setCart(prevCart => {
+                const existingItem = prevCart.find(item => item.id === prompt.id);
+                if (existingItem) {
+                    return prevCart.map(item =>
+                        item.id === prompt.id ? { ...item, quantity: item.quantity + 1 } : item
+                    );
+                } else {
+                    return [...prevCart, { ...prompt, quantity: 1 }];
+                }
+            });
+        } else {
+            Navigate('/login');
+        }
     };
 
     const removeFromCart = (promptId) => {

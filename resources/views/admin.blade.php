@@ -187,6 +187,12 @@
                                        placeholder="Enter prompt title">
                             </div>
                             <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Prompt Price</label>
+                                <input type="number" id="promptPrice" required
+                                       class="w-full px-4 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400"
+                                       placeholder="Enter prompt price.">
+                            </div>
+                            <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Category</label>
                                 <select id="promptCategory" required
                                         class="w-full px-4 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white">
@@ -544,6 +550,7 @@
         e.preventDefault();
 
         const title = document.getElementById('promptTitle').value;
+        const price = document.getElementById('promptPrice').value;
         const content = document.getElementById('promptContent').value;
         const category = document.getElementById('promptCategory').value;
 
@@ -565,14 +572,16 @@
 
 
             const uploadForm = new FormData()
-            uploadForm.append("file", file);
+            uploadForm.append("file", file, Math.random().toString(4));
 
             const uploadFile
-                = await apiCall("/file/upload",
-                {
-                    "method": "post"
-                },
-                uploadForm
+                = await apiCall("/file/upload", {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    body: uploadForm
+                }
             )
             console.log("Uploaded :: ");
 
@@ -593,12 +602,17 @@
                 formData.append('category', category);
                 formData.append('image', uploadFile.file_id);
                 formData.append('popular', 1);
+                formData.append('price', price);
 
 
                 const req = await apiCall('/prompts',
                     {
-                        method: 'POST'
-                    }, formData);
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
 
                 if (req) {
 
