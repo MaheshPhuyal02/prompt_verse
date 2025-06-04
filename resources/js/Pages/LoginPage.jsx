@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogIn, User, Lock, Mail, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react';
+import { LogIn, User, Lock, Mail, Eye, EyeOff, AlertCircle, ArrowRight, Phone } from 'lucide-react';
 import {useAuth} from "../api/auth_provider.jsx";
 
 
@@ -11,6 +11,7 @@ const LoginPage = () => {
         email: '',
         password: '',
         name: '',
+        phone: '',
         confirmPassword: ''
     });
     const [errors, setErrors] = useState({});
@@ -62,6 +63,10 @@ const LoginPage = () => {
                 newErrors.name = 'Name is required';
             }
 
+            if (formData.phone && !/^\+?[\d\s-]+$/.test(formData.phone)) {
+                newErrors.phone = 'Invalid phone number format';
+            }
+
             if (formData.password !== formData.confirmPassword) {
                 newErrors.confirmPassword = 'Passwords do not match';
             }
@@ -88,7 +93,7 @@ const LoginPage = () => {
                 success = await login(formData.email, formData.password);
             } else {
                 // Handle signup
-                success = await signup(formData.name, formData.email, formData.password);
+                success = await signup(formData.name, formData.email, formData.password, formData.phone);
             }
 
             if (success) {
@@ -210,6 +215,34 @@ const LoginPage = () => {
                                     <p className="mt-1 text-sm text-red-400">{errors.email}</p>
                                 )}
                             </div>
+
+                            {/* Phone field (signup only) */}
+                            {!isLogin && (
+                                <div className="mb-4">
+                                    <label htmlFor="phone" className="block text-gray-300 text-sm font-medium mb-2">
+                                        Phone Number (Optional)
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <Phone size={18} className="text-gray-500" />
+                                        </div>
+                                        <input
+                                            id="phone"
+                                            name="phone"
+                                            type="tel"
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                            className={`bg-gray-900 text-white w-full pl-10 pr-4 py-2 rounded-lg focus:ring-2 ${
+                                                errors.phone ? 'border border-red-500 focus:ring-red-500' : 'border border-gray-700 focus:ring-indigo-500'
+                                            }`}
+                                            placeholder="+1 (123) 456-7890"
+                                        />
+                                    </div>
+                                    {errors.phone && (
+                                        <p className="mt-1 text-sm text-red-400">{errors.phone}</p>
+                                    )}
+                                </div>
+                            )}
 
                             {/* Password field */}
                             <div className="mb-4">
