@@ -1,8 +1,22 @@
 import {ShoppingCart, Sparkles, Star} from 'lucide-react';
+import {addToCart} from "../api/api.js";
 
-const PromptCard = ({ prompt, onAddToCart }) => {
+const PromptCard = ({ prompt }) => {
     // We're creating a mockup with sample data since the original component was imported
 
+    const onAddToCart = async (prompt) => {
+        try {
+            const result = await addToCart(prompt);
+            if (result.success) {
+                alert("Prompt added to cart successfully!");
+            } else {
+                alert("Failed to add prompt to cart.");
+            }
+        } catch (error) {
+            console.error("Error adding prompt to cart:", error);
+            alert("An error occurred while adding the prompt to the cart.");
+        }
+    }
     const imageUrl =
         "http://127.0.0.1:8000/api/file/" + prompt.image;
 

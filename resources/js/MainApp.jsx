@@ -7,42 +7,12 @@ import ProfilePage from "./Pages/ProfilePage.jsx";
 import AdminPage from "./Pages/AdminPage.jsx";
 import LoginPage from "./Pages/LoginPage.jsx";
 import Navigation from "./compontents/Navigation.jsx";
-import {isAuthenticated} from "./api/api.js";
+import {addToCart, isAuthenticated} from "./api/api.js";
 
 
 // Navigation component with authentication status
 
 const MainApp = () => {
-    const [cart, setCart] = React.useState([]);
-
-    const addToCart = (prompt) => {
-        if(isAuthenticated()){
-            setCart(prevCart => {
-                const existingItem = prevCart.find(item => item.id === prompt.id);
-                if (existingItem) {
-                    return prevCart.map(item =>
-                        item.id === prompt.id ? { ...item, quantity: item.quantity + 1 } : item
-                    );
-                } else {
-                    return [...prevCart, { ...prompt, quantity: 1 }];
-                }
-            });
-        } else {
-            Navigate('/login');
-        }
-    };
-
-    const removeFromCart = (promptId) => {
-        setCart(prevCart => prevCart.filter(item => item.id !== promptId));
-    };
-
-    const clearCart = () => {
-        setCart([]);
-    };
-
-
-
-
     // index.php
     // login.php
 
@@ -55,15 +25,12 @@ const MainApp = () => {
                     <div className="container mx-auto">
                         <Routes>
                             <Route path="/login" element={<LoginPage />} />
-                            <Route path="/" element={<HomePage addToCart={addToCart} />} />
+                            <Route path="/" element={<HomePage />} />
                             <Route path="/" element={<AdminPage />} />
                             <Route
                                 path="/cart"
                                 element={
                                     <CartPage
-                                        cart={cart}
-                                        removeFromCart={removeFromCart}
-                                        clearCart={clearCart}
                                     />
                                 }
                             />

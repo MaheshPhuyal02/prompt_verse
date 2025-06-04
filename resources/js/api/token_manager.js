@@ -1,18 +1,20 @@
 class TokenManager {
+
+
     static getToken() {
-        return JSON.parse(localStorage.getItem('authToken'));
+        return JSON.parse(localStorage.getItem('user'));
     }
 
     static setToken(tokenData) {
-        localStorage.setItem('authToken', JSON.stringify(tokenData));
+        localStorage.setItem('user', JSON.stringify(tokenData));
     }
 
     static removeToken() {
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
     }
 
     static isAuthenticated() {
-        const token = this.getToken();
+        const token = TokenManager.getToken();
         return token && token.apiKey;
     }
 

@@ -171,44 +171,126 @@ export const apiService = {
             console.error('Error fetching prompt by ID:', error);
             throw error;
         }
+    },
+
+    // Add to cart function
+    addToCart: async (prompt) => {
+        try {
+            if (!TokenManager.isAuthenticated()) {
+                throw new Error('User not authenticated');
+            }
+
+            const id = prompt.id;
+
+            const requestOptions = {
+                method: "POST",
+                headers: apiService.createHeaders(),
+                body: JSON.stringify({
+                    prompt_id: id,
+                }),
+                redirect: "follow"
+            };
+
+            const response = await fetch(`${API_BASE_URL}/carts`, requestOptions);
+
+            if (!response.ok) {
+                throw new Error(`Failed to add prompt to cart! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Prompt added to cart:', data);
+            window.dispatchEvent(new Event('cartUpdated'));
+            return data;
+        } catch (error) {
+            console.error('Error adding prompt to cart:', error);
+            throw error;
+        }
+    },
+
+    getAllCarts: async () => {
+        try {
+            if (!TokenManager.isAuthenticated()) {
+                throw new Error('User not authenticated');
+            }
+
+            const requestOptions = {
+                method: "GET",
+                headers: apiService.createHeaders(),
+                redirect: "follow"
+            };
+
+            const response = await fetch(`${API_BASE_URL}/carts`, requestOptions);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch carts! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('All carts loaded:', data);
+            return data.data;
+        } catch (error) {
+            console.error('Error fetching carts:', error);
+            throw error;
+        }
+    },
+
+    // Delete from cart function
+    deleteFromCart: async (cartItemId) => {
+        try {
+            if (!TokenManager.isAuthenticated()) {
+                throw new Error('User not authenticated');
+            }
+
+            const requestOptions = {
+                method: "DELETE",
+                headers: apiService.createHeaders(),
+                redirect: "follow"
+            };
+
+            const response = await fetch(`${API_BASE_URL}/carts/${cartItemId}`, requestOptions);
+
+            if (!response.ok) {
+                throw new Error(`Failed to delete item from cart! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Item deleted from cart:', data);
+            window.dispatchEvent(new Event('cartUpdated'));
+            return data;
+        } catch (error) {
+            console.error('Error deleting item from cart:', error);
+            throw error;
+        }
+    },
+
+    // Clear cart function
+    clearCart: async () => {
+        try {
+            if (!TokenManager.isAuthenticated()) {
+                throw new Error('User not authenticated');
+            }
+
+            const requestOptions = {
+                method: "DELETE",
+                headers: apiService.createHeaders(),
+                redirect: "follow"
+            };
+
+            const response = await fetch(`${API_BASE_URL}/carts`, requestOptions);
+
+            if (!response.ok) {
+                throw new Error(`Failed to clear cart! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Cart cleared:', data);
+            window.dispatchEvent(new Event('cartUpdated'));
+            return data;
+        } catch (error) {
+            console.error('Error clearing cart:', error);
+            throw error;
+        }
     }
-};
-
-// Usage examples:
-
-// 1. Login user
-const loginUser = async (email, password) => {
-    try {
-        const result = await apiService.login(email, password);
-        console.log('Login successful:', result);
-        return result;
-    } catch (error) {
-        console.error('Login failed:', error);
-        throw error;
-    }
-};
-
-// 2. Signup user
-const signupUser = async (userData) => {
-    try {
-        const result = await apiService.signup(userData);
-        console.log('Signup successful:', result);
-        return result;
-    } catch (error) {
-        console.error('Signup failed:', error);
-        throw error;
-    }
-};
-
-// 3. Logout user
-const logoutUser = () => {
-    apiService.logout();
-    console.log('User logged out');
-};
-
-// 4. Check if user is authenticated
-const isUserAuthenticated = () => {
-    return TokenManager.isAuthenticated();
 };
 
 // 5. Fetch all prompts (requires authentication)
@@ -256,11 +338,12 @@ const loadPromptById = async (promptId) => {
     }
 };
 
-// Export individual functions for direct use
-export const login = apiService.login;
-export const signup = apiService.signup;
-export const logout = apiService.logout;
+export  const addToCart = apiService.addToCart;
+ 
+export const getAllCarts = apiService.getAllCarts;
+
+export const deleteFromCart = apiService.deleteFromCart;
+export const clearCart = apiService.clearCart;
+
 export const isAuthenticated = TokenManager.isAuthenticated;
 export const fetchPrompts = apiService.fetchPrompts;
-export const fetchPromptsByCategory = apiService.fetchPromptsByCategory;
-export const fetchPromptById = apiService.fetchPromptById;

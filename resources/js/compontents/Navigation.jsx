@@ -1,14 +1,38 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {Brain, Search, ShoppingCart, User, RefreshCw} from "lucide-react";
 import {Link} from "react-router-dom";
+import { getAllCarts } from "../api/api";
 
 
 function Navigation() {
     const [searchTerm, setSearchTerm] = useState('');
+    const [cartCount, setCartCount] = useState(0);
 
+    const fetchCartCount = async () => {
+        try {
+            const cartItems = await getAllCarts();
+            setCartCount(cartItems.items.length);
+        } catch (error) {
+            console.error('Error fetching cart count:', error);
+            setCartCount(0);
+        }
+    };
+
+    useEffect(() => {
+        fetchCartCount();
+
+        // Add event listener for cart updates
+        window.addEventListener('cartUpdated', fetchCartCount);
+
+        // Cleanup function to remove event listener
+        return () => {
+            window.removeEventListener('cartUpdated', fetchCartCount);
+        };
+    }, []);
+ 
     // User authentication functions (simplified)
     const isLoggedIn = () => {
-        // Example function to check login status
+        // Example function to check login status 
         return localStorage.getItem('user') !== null;
     };
 
@@ -51,7 +75,7 @@ function Navigation() {
 
                     <Link to="/cart" className="relative bg-indigo-600 hover:bg-indigo-700 rounded-full p-2 transition-colors">
                         <ShoppingCart size={20} />
-                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full text-xs flex items-center justify-center">3</span>
+                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full text-xs flex items-center justify-center">{cartCount}</span>
                     </Link>
 
                     {isLoggedIn() ? (

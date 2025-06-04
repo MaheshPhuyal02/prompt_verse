@@ -107,7 +107,6 @@ const HomePage = ({ addToCart }) => {
                             <PromptCard
                                 key={prompt.id}
                                 prompt={prompt}
-                                onAddToCart={addToCart}
                             />
                         ))}
                     </div>
