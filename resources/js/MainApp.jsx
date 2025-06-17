@@ -1,13 +1,15 @@
 import React, {useState} from "react";
 import { BrowserRouter as Router, Link, Route, Routes, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth, ProtectedRoute } from "./api/auth_provider.jsx";
-import HomePage from "./Pages/Home.jsx";
+
 import CartPage from "./Pages/CartPage.jsx";
-import ProfilePage from "./Pages/ProfilePage.jsx";
-import AdminPage from "./Pages/AdminPage.jsx";
 import LoginPage from "./Pages/LoginPage.jsx";
+import CheckoutPage from "./Pages/CheckoutPage.jsx";
 import Navigation from "./compontents/Navigation.jsx";
 import {addToCart, isAuthenticated} from "./api/api.js";
+import HomePage from "./Pages/Home.jsx";
+import AdminPage from "./Pages/AdminPage.jsx";
+import ProfilePage from "./Pages/ProfilePage.jsx";
 
 
 // Navigation component with authentication status
@@ -32,6 +34,14 @@ const MainApp = () => {
                                 element={
                                     <CartPage
                                     />
+                                }
+                            />
+                            <Route
+                                path="/checkout"
+                                element={
+                                    <ProtectedRoute>
+                                        <CheckoutPage />
+                                    </ProtectedRoute>
                                 }
                             />
                             <Route

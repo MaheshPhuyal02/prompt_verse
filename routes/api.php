@@ -5,6 +5,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\PromptController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\AddressController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,6 +30,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/file/upload', [FileController::class, 'saveFile']);
     Route::apiResource('purchases', PurchaseController::class);
     Route::apiResource('carts', CartController::class);
+    Route::get('/get_button', [CartController::class, 'getKhaltiButton']);
+    Route::get('/addresses', [AddressController::class, 'index']);
+    Route::post('/addresses', [AddressController::class, 'store']);
+    Route::put('/addresses/{address}', [AddressController::class, 'update']);
+    Route::delete('/addresses/{address}', [AddressController::class, 'destroy']);
+    Route::post('/addresses/{address}/default', [AddressController::class, 'setDefault']);
 });
 
 Route::get('/file/{fileId}', [FileController::class, 'getFile']);

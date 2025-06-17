@@ -1,12 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import { ShoppingCart, Trash2, CreditCard, AlertCircle, CheckCircle } from 'lucide-react';
 import {getAllCarts, deleteFromCart} from "../api/api.js";
+import {useNavigate} from "react-router-dom";
 
 const CartPage = () => {
     const [cartData, setCartData] = useState({
         items: [],
         summary: null
     });
+    const navigate = useNavigate();
 
     const [notification, setNotification] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -51,27 +53,14 @@ const CartPage = () => {
         fetchCartData();
     }, []);
 
-    const handleCheckout = async () => {
-        try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Refresh cart data after checkout
-            await fetchCartData();
-            
-            setNotification({
-                type: 'success',
-                message: 'Purchase successful! Your prompts are now available in your library.'
-            });
-
-            setTimeout(() => setNotification(null), 3000);
-        } catch (error) {
-            console.error('Error during checkout:', error);
+    const handleCheckout = () => {
+        if (cartData.summary && cartData.summary.id) {
+            navigate('/checkout', { state: { cartId: cartData.summary.id } });
+        } else {
             setNotification({
                 type: 'error',
-                message: 'Failed to complete purchase. Please try again.'
+                message: 'Unable to proceed to checkout. Please try again.'
             });
-
             setTimeout(() => setNotification(null), 3000);
         }
     };

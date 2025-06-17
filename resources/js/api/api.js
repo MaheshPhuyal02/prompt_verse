@@ -233,7 +233,6 @@ export const apiService = {
             throw error;
         }
     },
-
     // Delete from cart function
     deleteFromCart: async (cartItemId) => {
         try {
@@ -290,7 +289,166 @@ export const apiService = {
             console.error('Error clearing cart:', error);
             throw error;
         }
-    }
+    },
+    getButton : async (cartId) => {
+        try {
+            if (!TokenManager.isAuthenticated()) {
+                throw new Error('User not authenticated');
+            }
+
+            const requestOptions = {
+                method: "GET",
+                headers: apiService.createHeaders(),
+                redirect: "follow"
+            };
+
+            const response = await fetch(`${API_BASE_URL}/get_button?cartId=${cartId}`, requestOptions);
+
+            if (!response.ok) {
+                throw new Error(`Failed to get button! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Button data:', data);
+            return data;
+        } catch (error) {
+            console.error('Error getting button:', error);
+            throw error;
+        }
+    },
+
+    // Address related functions
+    getAddresses: async () => {
+        try {
+            if (!TokenManager.isAuthenticated()) {
+                throw new Error('User not authenticated');
+            }
+
+            const requestOptions = {
+                method: "GET",
+                headers: apiService.createHeaders(),
+                redirect: "follow"
+            };
+
+            const response = await fetch(`${API_BASE_URL}/addresses`, requestOptions);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch addresses! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.data;
+        } catch (error) {
+            console.error('Error fetching addresses:', error);
+            throw error;
+        }
+    },
+
+    addAddress: async (addressData) => {
+        try {
+            if (!TokenManager.isAuthenticated()) {
+                throw new Error('User not authenticated');
+            }
+
+            const requestOptions = {
+                method: "POST",
+                headers: apiService.createHeaders(),
+                body: JSON.stringify(addressData),
+                redirect: "follow"
+            };
+
+            const response = await fetch(`${API_BASE_URL}/addresses`, requestOptions);
+
+            if (!response.ok) {
+                throw new Error(`Failed to add address! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.data;
+        } catch (error) {
+            console.error('Error adding address:', error);
+            throw error;
+        }
+    },
+
+    updateAddress: async (addressId, addressData) => {
+        try {
+            if (!TokenManager.isAuthenticated()) {
+                throw new Error('User not authenticated');
+            }
+
+            const requestOptions = {
+                method: "PUT",
+                headers: apiService.createHeaders(),
+                body: JSON.stringify(addressData),
+                redirect: "follow"
+            };
+
+            const response = await fetch(`${API_BASE_URL}/addresses/${addressId}`, requestOptions);
+
+            if (!response.ok) {
+                throw new Error(`Failed to update address! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.data;
+        } catch (error) {
+            console.error('Error updating address:', error);
+            throw error;
+        }
+    },
+
+    deleteAddress: async (addressId) => {
+        try {
+            if (!TokenManager.isAuthenticated()) {
+                throw new Error('User not authenticated');
+            }
+
+            const requestOptions = {
+                method: "DELETE",
+                headers: apiService.createHeaders(),
+                redirect: "follow"
+            };
+
+            const response = await fetch(`${API_BASE_URL}/addresses/${addressId}`, requestOptions);
+
+            if (!response.ok) {
+                throw new Error(`Failed to delete address! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error deleting address:', error);
+            throw error;
+        }
+    },
+
+    setDefaultAddress: async (addressId) => {
+        try {
+            if (!TokenManager.isAuthenticated()) {
+                throw new Error('User not authenticated');
+            }
+
+            const requestOptions = {
+                method: "POST",
+                headers: apiService.createHeaders(),
+                redirect: "follow"
+            };
+
+            const response = await fetch(`${API_BASE_URL}/addresses/${addressId}/default`, requestOptions);
+
+            if (!response.ok) {
+                throw new Error(`Failed to set default address! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error setting default address:', error);
+            throw error;
+        }
+    },
 };
 
 // 5. Fetch all prompts (requires authentication)
@@ -339,11 +497,18 @@ const loadPromptById = async (promptId) => {
 };
 
 export  const addToCart = apiService.addToCart;
- 
+
 export const getAllCarts = apiService.getAllCarts;
 
 export const deleteFromCart = apiService.deleteFromCart;
 export const clearCart = apiService.clearCart;
+
+export const getButton = apiService.getButton;
+
+export const getAddresses = apiService.getAddresses;
+export const addAddress = apiService.addAddress;
+export const updateAddress = apiService.updateAddress;
+
 
 export const isAuthenticated = TokenManager.isAuthenticated;
 export const fetchPrompts = apiService.fetchPrompts;

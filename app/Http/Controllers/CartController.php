@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Prompt;
 use App\Models\Purchase;
+use App\Models\UserPrompt;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Http;
 
 class CartController extends Controller
 {
@@ -34,7 +36,11 @@ class CartController extends Controller
                 ];
             });
 
+        // Create a unique cart ID for this session
+        $cartId = 'CART_' . Auth::id() . '_' . time();
+
         $cartSummary = [
+            'id' => $cartId,
             'total_items' => $cartItems->sum('quantity'),
             'total_amount' => $cartItems->sum('total_price'),
             'items_count' => $cartItems->count(),
@@ -283,5 +289,205 @@ class CartController extends Controller
             'success' => true,
             'data' => $summary
         ]);
+    }
+
+    /**
+     * Generate Khalti payment button for a cart.
+     */
+    public function getKhaltiButton(Request $request): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+            
+            // Get all cart items for the user
+            $cartItems = Cart::with(['prompt'])
+                ->forUser(Auth::id())
+                ->get(); 
+
+            if ($cartItems->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cart is empty'
+                ], 400);
+            }
+
+            // Calculate total amount
+            $totalAmount = $cartItems->sum('total_price') * 100; // Convert to paisa
+
+            // Create purchase order name from cart items
+            $purchaseOrderName = $cartItems->count() > 1 
+                ? "Multiple Prompts Purchase" 
+                : $cartItems->first()->prompt->title;
+
+            // Prepare product details from cart items
+            $productDetails = $cartItems->map(function ($item) {
+                return [
+                    'identity' => (string)$item->prompt_id,
+                    'name' => $item->prompt->title,
+                    'total_price' => $item->total_price * 100, // Convert to paisa
+                    'quantity' => $item->quantity,
+                    'unit_price' => $item->price_at_time * 100 // Convert to paisa
+                ];
+            })->toArray();
+
+            // Calculate VAT (assuming 13% VAT)
+            $vatAmount = round($totalAmount * 0.13);
+            $markPrice = $totalAmount - $vatAmount;
+
+            $response = Http::withHeaders([
+                'Authorization' => 'key ' . config('services.khalti.secret_key'),
+                'Content-Type' => 'application/json',
+            ])->post('https://dev.khalti.com/api/v2/epayment/initiate/', [
+                'return_url' => config('app.url') . '/payment/success',
+                'website_url' => config('app.url'),
+                'amount' => (string)$totalAmount,
+                'purchase_order_id' => $request->cartId ?? 'ORDER_' . time(),
+                'purchase_order_name' => $purchaseOrderName,
+                'customer_info' => [
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone ?? '9800000000',
+                ],
+                'amount_breakdown' => [
+                    [
+                        'label' => 'Mark Price',
+                        'amount' => $markPrice
+                    ],
+                    [
+                        'label' => 'VAT',
+                        'amount' => $vatAmount
+                    ]
+                ],
+                'product_details' => $productDetails,
+                'merchant_extra' => json_encode([
+                    'user_id' => $user->id,
+                    'cart_items' => $cartItems->pluck('id')->toArray()
+                ])
+            ]);
+
+            if ($response->successful()) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $response->json()
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate payment button',
+                'error' => $response->json()
+            ], 400);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate payment button',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function handleKhaltiReturn(Request $request): JsonResponse
+    {
+        try {
+            // Verify the payment status from Khalti
+            $response = Http::withHeaders([
+                'Authorization' => 'key ' . config('services.khalti.secret_key'),
+                'Content-Type' => 'application/json',
+            ])->post('https://dev.khalti.com/api/v2/epayment/lookup/', [
+                'pidx' => $request->pidx
+            ]);
+
+            if (!$response->successful() || $response->json('status') !== 'Completed') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Payment verification failed'
+                ], 400);
+            }
+
+            $paymentData = $response->json();
+            $merchantExtra = json_decode($paymentData['merchant_extra'] ?? '{}', true);
+            $userId = $merchantExtra['user_id'] ?? null;
+
+            if (!$userId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid payment data'
+                ], 400);
+            }
+
+            DB::beginTransaction();
+            try {
+                // Get cart items for the user
+                $cartItems = Cart::with('prompt')
+                    ->forUser($userId)
+                    ->get();
+
+                if ($cartItems->isEmpty()) {
+                    throw new \Exception('Cart is empty');
+                }
+
+                $purchases = [];
+                $totalAmount = 0;
+                $userPrompts = [];
+
+                // Create purchases for each cart item
+                foreach ($cartItems as $item) {
+                    for ($i = 0; $i < $item->quantity; $i++) {
+                        // Create purchase record
+                        $purchase = Purchase::create([
+                            'user_id' => $userId,
+                            'prompt_id' => $item->prompt_id,
+                            'price_at_time' => $item->price_at_time,
+                            'payment_id' => $paymentData['pidx'],
+                            'payment_method' => 'khalti',
+                            'status' => 'completed',
+                            'purchased_at' => now(),
+                        ]);
+                        $purchases[] = $purchase;
+
+                        // Create user prompt record
+                        $userPrompt = UserPrompt::create([
+                            'user_id' => $userId,
+                            'prompt_id' => $item->prompt_id,
+                            'purchase_id' => $purchase->id,
+                            'status' => 'active',
+                            'access_granted_at' => now(),
+                        ]);
+                        $userPrompts[] = $userPrompt;
+
+                        $totalAmount += $item->price_at_time;
+                    }
+                }
+
+                // Clear the cart after successful purchase
+                Cart::forUser($userId)->delete();
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Payment processed successfully',
+                    'data' => [
+                        'purchases_count' => count($purchases),
+                        'total_amount' => $totalAmount,
+                        'payment_id' => $paymentData['pidx'],
+                        'purchase_ids' => collect($purchases)->pluck('id'),
+                        'user_prompt_ids' => collect($userPrompts)->pluck('id'),
+                    ]
+                ]);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process payment',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

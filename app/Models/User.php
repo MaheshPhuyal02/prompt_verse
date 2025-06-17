@@ -46,6 +46,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the addresses for the user.
+     */
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    /**
+     * Get the default address for the user.
+     */
+    public function defaultAddress()
+    {
+        return $this->addresses()->where('is_default', true)->first();
+    }
+
+    /**
      * Get total amount spent by the user.
      */
     public function getTotalSpentAttribute(): float

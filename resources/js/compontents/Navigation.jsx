@@ -1,13 +1,12 @@
 import React, {useState, useEffect} from "react";
 import {Brain, Search, ShoppingCart, User, RefreshCw} from "lucide-react";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { getAllCarts } from "../api/api";
 
 
 function Navigation() {
     const [searchTerm, setSearchTerm] = useState('');
     const [cartCount, setCartCount] = useState(0);
-
     const fetchCartCount = async () => {
         try {
             const cartItems = await getAllCarts();
@@ -29,10 +28,10 @@ function Navigation() {
             window.removeEventListener('cartUpdated', fetchCartCount);
         };
     }, []);
- 
+
     // User authentication functions (simplified)
     const isLoggedIn = () => {
-        // Example function to check login status 
+        // Example function to check login status
         return localStorage.getItem('user') !== null;
     };
 
