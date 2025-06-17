@@ -338,7 +338,7 @@ class CartController extends Controller
                 'Authorization' => 'key ' . config('services.khalti.secret_key'),
                 'Content-Type' => 'application/json',
             ])->post('https://dev.khalti.com/api/v2/epayment/initiate/', [
-                'return_url' => config('app.url') . '/payment/success',
+                'return_url' => config('app.url') . '/api/payment/success',
                 'website_url' => config('app.url'),
                 'amount' => (string)$totalAmount,
                 'purchase_order_id' => $request->cartId ?? 'ORDER_' . time(),
