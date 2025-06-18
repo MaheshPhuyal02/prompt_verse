@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Http;
 
@@ -294,15 +295,14 @@ class CartController extends Controller
     /**
      * Generate Khalti payment button for a cart.
      */
-    public function getKhaltiButton(Request $request): JsonResponse
+    public function getKhaltiButton(Request $request)
     {
         try {
             $user = Auth::user();
-            
             // Get all cart items for the user
             $cartItems = Cart::with(['prompt'])
                 ->forUser(Auth::id())
-                ->get(); 
+                ->get();
 
             if ($cartItems->isEmpty()) {
                 return response()->json([
@@ -315,8 +315,8 @@ class CartController extends Controller
             $totalAmount = $cartItems->sum('total_price') * 100; // Convert to paisa
 
             // Create purchase order name from cart items
-            $purchaseOrderName = $cartItems->count() > 1 
-                ? "Multiple Prompts Purchase" 
+            $purchaseOrderName = $cartItems->count() > 1
+                ? "Multiple Prompts Purchase"
                 : $cartItems->first()->prompt->title;
 
             // Prepare product details from cart items
@@ -338,7 +338,7 @@ class CartController extends Controller
                 'Authorization' => 'key ' . config('services.khalti.secret_key'),
                 'Content-Type' => 'application/json',
             ])->post('https://dev.khalti.com/api/v2/epayment/initiate/', [
-                'return_url' => config('app.url') . '/api/payment/success',
+                'return_url' => 'http://127.0.0.1:8000/api/payment/success',
                 'website_url' => config('app.url'),
                 'amount' => (string)$totalAmount,
                 'purchase_order_id' => $request->cartId ?? 'ORDER_' . time(),
@@ -359,10 +359,7 @@ class CartController extends Controller
                     ]
                 ],
                 'product_details' => $productDetails,
-                'merchant_extra' => json_encode([
-                    'user_id' => $user->id,
-                    'cart_items' => $cartItems->pluck('id')->toArray()
-                ])
+                'merchant_extra' =>  Auth::id()
             ]);
 
             if ($response->successful()) {
@@ -387,8 +384,23 @@ class CartController extends Controller
         }
     }
 
-    public function handleKhaltiReturn(Request $request): JsonResponse
+    public function handleKhaltiReturn(Request $request)
     {
+//        return "GOT REQUEST " . json_encode([
+//            'all' => $request->all(),
+//            'pidx' => $request->pidx,
+//            'transaction_id' => $request->transaction_id,
+//            'tidx' => $request->tidx,
+//            'txnId' => $request->txnId,
+//            'amount' => $request->amount,
+//            'total_amount' => $request->total_amount,
+//            'mobile' => $request->mobile,
+//            'status' => $request->status,
+//            'purchase_order_id' => $request->purchase_order_id,
+//            'purchase_order_name' => $request->purchase_order_name,
+//            'merchant_extra' => $request->merchant_extra
+//        ]);
+
         try {
             // Verify the payment status from Khalti
             $response = Http::withHeaders([
@@ -398,22 +410,27 @@ class CartController extends Controller
                 'pidx' => $request->pidx
             ]);
 
+
             if (!$response->successful() || $response->json('status') !== 'Completed') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Payment verification failed'
-                ], 400);
+                return redirect()->to('http://localhost:8000/payment/failed?message=Payment verification failed');
             }
 
             $paymentData = $response->json();
-            $merchantExtra = json_decode($paymentData['merchant_extra'] ?? '{}', true);
-            $userId = $merchantExtra['user_id'] ?? null;
+
+
+            $userId = $request->merchant_extra;
+
+//            return "pidx " . $request->pidx . " userId " . $userId;
 
             if (!$userId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid payment data'
-                ], 400);
+                return redirect()->to('http://localhost:8000/payment/failed?message=Invalid payment data');
+            }
+
+//            return "<p>Payment successful! Redirecting...</p>"
+//                . json_encode($paymentData);
+
+            if($paymentData["status"] !== 'Completed') {
+                return redirect()->to('http://localhost:8000/payment/failed?message=Payment not completed');
             }
 
             DB::beginTransaction();
@@ -438,11 +455,11 @@ class CartController extends Controller
                         $purchase = Purchase::create([
                             'user_id' => $userId,
                             'prompt_id' => $item->prompt_id,
-                            'price_at_time' => $item->price_at_time,
                             'payment_id' => $paymentData['pidx'],
                             'payment_method' => 'khalti',
                             'status' => 'completed',
                             'purchased_at' => now(),
+                            'transaction_id' => $paymentData['transaction_id'] ?? null,
                         ]);
                         $purchases[] = $purchase;
 
@@ -465,17 +482,14 @@ class CartController extends Controller
 
                 DB::commit();
 
-                return response()->json([
+                // Redirect to frontend success page with purchase details
+                return redirect()->to('http://localhost:8000/payment/success?' . http_build_query([
                     'success' => true,
                     'message' => 'Payment processed successfully',
-                    'data' => [
-                        'purchases_count' => count($purchases),
-                        'total_amount' => $totalAmount,
-                        'payment_id' => $paymentData['pidx'],
-                        'purchase_ids' => collect($purchases)->pluck('id'),
-                        'user_prompt_ids' => collect($userPrompts)->pluck('id'),
-                    ]
-                ]);
+                    'purchases_count' => count($purchases),
+                    'total_amount' => $totalAmount,
+                    'payment_id' => $paymentData['pidx']
+                ]));
 
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -483,11 +497,14 @@ class CartController extends Controller
             }
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to process payment',
-                'error' => $e->getMessage()
-            ], 500);
+
+            // log
+            Log::error('An exception occurred', ['exception' => $e]);
+
+            return redirect()->to('http://localhost:8000/payment/failed?message=' .
+                urlencode($e->getMessage())
+                . '&error=' . urlencode($e->getTraceAsString())
+            );
         }
     }
 }

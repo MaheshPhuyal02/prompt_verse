@@ -14,16 +14,17 @@ class Purchase extends Model
     protected $fillable = [
         'user_id',
         'prompt_id',
-        'purchase_price',
-        'purchase_date',
-        'prompt_snapshot',
+        'price_at_time',
+        'payment_id',
+        'payment_method',
         'status',
+        'purchased_at',
+        'transaction_id',
     ];
 
     protected $casts = [
-        'purchase_price' => 'decimal:2',
-        'purchase_date' => 'datetime',
-        'prompt_snapshot' => 'array',
+        'price_at_time' => 'decimal:2',
+        'purchased_at' => 'datetime',
     ];
 
     protected $hidden = [
@@ -69,7 +70,7 @@ class Purchase extends Model
      */
     public function scopeBetweenDates($query, $startDate, $endDate)
     {
-        return $query->whereBetween('purchase_date', [$startDate, $endDate]);
+        return $query->whereBetween('purchased_at', [$startDate, $endDate]);
     }
 
     /**
@@ -77,7 +78,7 @@ class Purchase extends Model
      */
     public function getFormattedPurchaseDateAttribute(): string
     {
-        return $this->purchase_date->format('M d, Y');
+        return $this->purchased_at->format('M d, Y');
     }
 
     /**
@@ -89,7 +90,7 @@ class Purchase extends Model
     }
 
     /**
-     * Get current prompt data or fallback to snapshot.
+     * Get current prompt data.
      */
     public function getPromptData(): array
     {
@@ -105,8 +106,7 @@ class Purchase extends Model
             ];
         }
 
-        // Fallback to snapshot if prompt is deleted
-        return $this->prompt_snapshot ?? [];
+        return [];
     }
 
     /**

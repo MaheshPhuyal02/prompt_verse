@@ -43,5 +43,5 @@ Route::get('/file/{fileId}', [FileController::class, 'getFile']);
 Route::apiResource('prompts', PromptController::class);
 
 // Khalti payment return URL - this should be public as Khalti will call it
-Route::post('/payment/success', [CartController::class, 'handleKhaltiReturn']);
+Route::get('/payment/success', [CartController::class, 'handleKhaltiReturn']);
 

@@ -10,6 +10,8 @@ import {addToCart, isAuthenticated} from "./api/api.js";
 import HomePage from "./Pages/Home.jsx";
 import AdminPage from "./Pages/AdminPage.jsx";
 import ProfilePage from "./Pages/ProfilePage.jsx";
+import PaymentSuccessPage from "./Pages/PaymentSuccessPage.jsx";
+import PaymentFailedPage from "./Pages/PaymentFailedPage.jsx";
 
 
 // Navigation component with authentication status
@@ -57,6 +59,22 @@ const MainApp = () => {
                                 element={
                                     <ProtectedRoute>
                                         <AdminPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/payment/success"
+                                element={
+                                    <ProtectedRoute>
+                                        <PaymentSuccessPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/payment/failed"
+                                element={
+                                    <ProtectedRoute>
+                                        <PaymentFailedPage />
                                     </ProtectedRoute>
                                 }
                             />
