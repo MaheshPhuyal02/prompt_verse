@@ -13,11 +13,6 @@ const CheckoutPage = () => {
         firstName: '',
         lastName: '',
         phone: '',
-        province: '',
-        district: '',
-        municipality: '',
-        ward: '',
-        streetAddress: '', 
     });
     const [paymentData, setPaymentData] = useState(null);
     const [error, setError] = useState(null);
@@ -78,11 +73,6 @@ const CheckoutPage = () => {
                 first_name: formData.firstName,
                 last_name: formData.lastName,
                 phone: formData.phone,
-                province: formData.province,
-                district: formData.district,
-                municipality: formData.municipality,
-                ward: formData.ward,
-                street_address: formData.streetAddress,
             };
 
             const newAddress = await addAddress(addressData);
@@ -93,11 +83,6 @@ const CheckoutPage = () => {
                 firstName: '',
                 lastName: '',
                 phone: '',
-                province: '',
-                district: '',
-                municipality: '',
-                ward: '',
-                streetAddress: '',
             });
         } catch (err) {
             setError('Failed to add new address. Please try again.');
@@ -254,78 +239,6 @@ const CheckoutPage = () => {
                                             value={formData.phone}
                                             onChange={handleInputChange}
                                             placeholder="+977 98XXXXXXXX"
-                                            className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label className="block text-gray-300 mb-2">Province</label>
-                                            <select
-                                                name="province"
-                                                value={formData.province}
-                                                onChange={handleInputChange}
-                                                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
-                                                required
-                                            >
-                                                <option value="">Select Province</option>
-                                                <option value="1">Province 1</option>
-                                                <option value="2">Province 2</option>
-                                                <option value="3">Province 3</option>
-                                                <option value="4">Province 4</option>
-                                                <option value="5">Province 5</option>
-                                                <option value="6">Province 6</option>
-                                                <option value="7">Province 7</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-gray-300 mb-2">District</label>
-                                            <input
-                                                type="text"
-                                                name="district"
-                                                value={formData.district}
-                                                onChange={handleInputChange}
-                                                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label className="block text-gray-300 mb-2">Municipality</label>
-                                            <input
-                                                type="text"
-                                                name="municipality"
-                                                value={formData.municipality}
-                                                onChange={handleInputChange}
-                                                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-gray-300 mb-2">Ward Number</label>
-                                            <input
-                                                type="number"
-                                                name="ward"
-                                                value={formData.ward}
-                                                onChange={handleInputChange}
-                                                min="1"
-                                                max="32"
-                                                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-gray-300 mb-2">Street Address</label>
-                                        <input
-                                            type="text"
-                                            name="streetAddress"
-                                            value={formData.streetAddress}
-                                            onChange={handleInputChange}
                                             className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500"
                                             required
                                         />

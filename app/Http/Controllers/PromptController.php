@@ -4,12 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Prompt;
 use Illuminate\Http\Request;
+use App\Models\Purchase;
+use Illuminate\Support\Facades\Auth;
 
 class PromptController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Prompt::all();
+        $user = auth('sanctum')->user();
+
+//        return "got user {$user}";
+
+        if ($user) {
+            $purchasedPromptIds = Purchase::where('user_id', $user->id)
+                ->whereIn('status', ['active', 'completed'])
+                ->pluck('prompt_id');
+            return Prompt::whereNotIn('id', $purchasedPromptIds)
+                ->get(['id', 'title', 'rating', 'price', 'image', 'category', 'popular']);
+        }
+        return Prompt::all(['id', 'title', 'rating', 'price', 'image', 'category', 'popular']);
     }
 
 

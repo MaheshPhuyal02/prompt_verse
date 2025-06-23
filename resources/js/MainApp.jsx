@@ -8,7 +8,6 @@ import CheckoutPage from "./Pages/CheckoutPage.jsx";
 import Navigation from "./compontents/Navigation.jsx";
 import {addToCart, isAuthenticated} from "./api/api.js";
 import HomePage from "./Pages/Home.jsx";
-import AdminPage from "./Pages/AdminPage.jsx";
 import ProfilePage from "./Pages/ProfilePage.jsx";
 import PaymentSuccessPage from "./Pages/PaymentSuccessPage.jsx";
 import PaymentFailedPage from "./Pages/PaymentFailedPage.jsx";
@@ -30,7 +29,6 @@ const MainApp = () => {
                         <Routes>
                             <Route path="/login" element={<LoginPage />} />
                             <Route path="/" element={<HomePage />} />
-                            <Route path="/" element={<AdminPage />} />
                             <Route
                                 path="/cart"
                                 element={
@@ -54,14 +52,7 @@ const MainApp = () => {
                                     </ProtectedRoute>
                                 }
                             />
-                            <Route
-                                path="/admin"
-                                element={
-                                    <ProtectedRoute>
-                                        <AdminPage />
-                                    </ProtectedRoute>
-                                }
-                            />
+
                             <Route
                                 path="/payment/success"
                                 element={

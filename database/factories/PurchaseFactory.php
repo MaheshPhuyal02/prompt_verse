@@ -13,84 +13,26 @@ class PurchaseFactory extends Factory
 
     public function definition(): array
     {
-        $prompt = Prompt::factory()->create();
+        // To avoid creating a new prompt for every purchase, we get a random one if it exists.
+        $prompt = Prompt::inRandomOrder()->first();
+        if (!$prompt) {
+            $prompt = Prompt::factory()->create();
+        }
+
+        $user = User::inRandomOrder()->first();
+        if (!$user) {
+            $user = User::factory()->create();
+        }
 
         return [
-            'user_id' => User::factory(),
+            'user_id' => $user->id,
             'prompt_id' => $prompt->id,
-            'purchase_price' => $prompt->price, // Use current prompt price
-            'purchase_date' => $this->faker->dateTimeBetween('-6 months', 'now'),
-            'prompt_snapshot' => [
-                'title' => $prompt->title,
-                'description' => $prompt->description,
-                'category' => $prompt->category,
-                'image' => $prompt->image,
-                'rating' => $prompt->rating,
-                'popular' => $prompt->popular,
-            ],
-            'status' => $this->faker->randomElement(['active', 'active', 'active', 'inactive']), // More active purchases
+            'price_at_time' => $prompt->price,
+            'purchased_at' => $this->faker->dateTimeBetween('-6 months', 'now'),
+            'status' => $this->faker->randomElement(['completed', 'pending', 'failed', 'refunded']),
+            'payment_id' => 'khalti:' . $this->faker->uuid,
+            'payment_method' => 'khalti',
+            'transaction_id' => $this->faker->uuid,
         ];
-    }
-
-    /**
-     * Indicate that the purchase is active.
-     */
-    public function active(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'active',
-        ]);
-    }
-
-    /**
-     * Indicate that the purchase is refunded.
-     */
-    public function refunded(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'refunded',
-        ]);
-    }
-
-    /**
-     * Create a purchase for an existing prompt.
-     */
-    public function forPrompt(Prompt $prompt): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'prompt_id' => $prompt->id,
-            'purchase_price' => $prompt->price,
-            'prompt_snapshot' => [
-                'title' => $prompt->title,
-                'description' => $prompt->description,
-                'category' => $prompt->category,
-                'image' => $prompt->image,
-                'rating' => $prompt->rating,
-                'popular' => $prompt->popular,
-            ],
-        ]);
-    }
-
-    /**
-     * Create a purchase with a specific category.
-     */
-    public function category(string $category): static
-    {
-        return $this->state(function (array $attributes) use ($category) {
-            $prompt = Prompt::factory()->create(['category' => $category]);
-
-            return [
-                'prompt_id' => $prompt->id,
-                'purchase_price' => $prompt->price,
-                'prompt_snapshot' => [
-                    'title' => $prompt->title,
-                    'description' => $prompt->description,
-                    'category' => $prompt->category,
-                    'image' => $prompt->image,
-                    'rating' => $prompt->rating,
-                    'popular' => $prompt->popular,
-                ],
-            ];
-        });
     }
 }

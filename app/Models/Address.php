@@ -15,17 +15,11 @@ class Address extends Model
         'first_name',
         'last_name',
         'phone',
-        'province',
-        'district',
-        'municipality',
-        'ward',
-        'street_address',
         'is_default',
     ];
 
     protected $casts = [
         'is_default' => 'boolean',
-        'ward' => 'integer',
     ];
 
     /**
@@ -49,6 +43,6 @@ class Address extends Model
      */
     public function getCompleteAddressAttribute(): string
     {
-        return "{$this->street_address}, Ward {$this->ward}, {$this->municipality}, {$this->district}, {$this->province}";
+        return "{$this->first_name} {$this->last_name}, {$this->phone}";
     }
 } 

@@ -12,6 +12,7 @@ export const apiService = {
         headers.append("Accept", "application/json");
 
         if (includeAuth && TokenManager.isAuthenticated()) {
+
             headers.append("Authorization", `Bearer ${TokenManager.getApiKey()}`);
         }
 
@@ -449,6 +450,29 @@ export const apiService = {
             throw error;
         }
     },
+
+    // Fetch user's purchased prompts (purchase history)
+    getPurchasedPrompts: async () => {
+        try {
+            if (!TokenManager.isAuthenticated()) {
+                throw new Error('User not authenticated');
+            }
+            const requestOptions = {
+                method: "GET",
+                headers: apiService.createHeaders(),
+                redirect: "follow"
+            };
+            const response = await fetch(`${API_BASE_URL}/user/purchases`, requestOptions);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch purchased prompts! status: ${response.status}`);
+            }
+            const data = await response.json();
+            return data.data; // Adjust if backend response structure is different
+        } catch (error) {
+            console.error('Error fetching purchased prompts:', error);
+            throw error;
+        }
+    },
 };
 
 // 5. Fetch all prompts (requires authentication)
@@ -509,6 +533,7 @@ export const getAddresses = apiService.getAddresses;
 export const addAddress = apiService.addAddress;
 export const updateAddress = apiService.updateAddress;
 
+export const getPurchasedPrompts = apiService.getPurchasedPrompts;
 
 export const isAuthenticated = TokenManager.isAuthenticated;
 export const fetchPrompts = apiService.fetchPrompts;

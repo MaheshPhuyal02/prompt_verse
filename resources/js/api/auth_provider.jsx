@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Signup function
-    const signup = async (name, email, password) => {
+    const signup = async (email, password) => {
         try {
             // API call to create a new user
             const response = await fetch(apiBase  + "/signup", {
@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ name, email, password }),
+                body: JSON.stringify({ email, password }),
             });
 
             if (!response.ok) {
@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }) => {
             // Store user info in state and local storage
             const userData = {
                 email,
-                name,
+                name: data.name,
                 apiKey: data.apiKey,
             };
 

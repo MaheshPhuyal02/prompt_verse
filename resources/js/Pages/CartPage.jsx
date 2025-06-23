@@ -128,7 +128,7 @@ const CartPage = () => {
                                                 <div key={item.id} className="flex justify-between items-start py-4">
                                                     <div className="flex-grow">
                                                         <h3 className="text-xl font-medium">{item.prompt.title}</h3>
-                                                        <p className="text-gray-400 mt-1">{item.prompt.description}</p>
+
                                                         <div className="mt-2 flex items-center space-x-4">
                                                             <span className="text-indigo-300 font-semibold">
                                                                 ${item.price_at_time} × {item.quantity}

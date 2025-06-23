@@ -454,6 +454,7 @@ class CartController extends Controller
                         // Create purchase record
                         $purchase = Purchase::create([
                             'user_id' => $userId,
+                            'price_at_time' => $item->price_at_time,
                             'prompt_id' => $item->prompt_id,
                             'payment_id' => $paymentData['pidx'],
                             'payment_method' => 'khalti',
@@ -462,22 +463,10 @@ class CartController extends Controller
                             'transaction_id' => $paymentData['transaction_id'] ?? null,
                         ]);
                         $purchases[] = $purchase;
-
-                        // Create user prompt record
-                        $userPrompt = UserPrompt::create([
-                            'user_id' => $userId,
-                            'prompt_id' => $item->prompt_id,
-                            'purchase_id' => $purchase->id,
-                            'status' => 'active',
-                            'access_granted_at' => now(),
-                        ]);
-                        $userPrompts[] = $userPrompt;
-
                         $totalAmount += $item->price_at_time;
                     }
                 }
 
-                // Clear the cart after successful purchase
                 Cart::forUser($userId)->delete();
 
                 DB::commit();

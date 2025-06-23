@@ -10,8 +10,6 @@ const LoginPage = () => {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-        name: '',
-        phone: '',
         confirmPassword: ''
     });
     const [errors, setErrors] = useState({});
@@ -59,14 +57,6 @@ const LoginPage = () => {
         }
 
         if (!isLogin) {
-            if (!formData.name) {
-                newErrors.name = 'Name is required';
-            }
-
-            if (formData.phone && !/^\+?[\d\s-]+$/.test(formData.phone)) {
-                newErrors.phone = 'Invalid phone number format';
-            }
-
             if (formData.password !== formData.confirmPassword) {
                 newErrors.confirmPassword = 'Passwords do not match';
             }
@@ -93,7 +83,7 @@ const LoginPage = () => {
                 success = await login(formData.email, formData.password);
             } else {
                 // Handle signup
-                success = await signup(formData.name, formData.email, formData.password, formData.phone);
+                success = await signup(formData.email, formData.password);
             }
 
             if (success) {
@@ -162,34 +152,6 @@ const LoginPage = () => {
                         )}
 
                         <form onSubmit={handleSubmit}>
-                            {/* Name field (signup only) */}
-                            {!isLogin && (
-                                <div className="mb-4">
-                                    <label htmlFor="name" className="block text-gray-300 text-sm font-medium mb-2">
-                                        Full Name
-                                    </label>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <User size={18} className="text-gray-500" />
-                                        </div>
-                                        <input
-                                            id="name"
-                                            name="name"
-                                            type="text"
-                                            value={formData.name}
-                                            onChange={handleChange}
-                                            className={`bg-gray-900 text-white w-full pl-10 pr-4 py-2 rounded-lg focus:ring-2 ${
-                                                errors.name ? 'border border-red-500 focus:ring-red-500' : 'border border-gray-700 focus:ring-indigo-500'
-                                            }`}
-                                            placeholder="Your Name"
-                                        />
-                                    </div>
-                                    {errors.name && (
-                                        <p className="mt-1 text-sm text-red-400">{errors.name}</p>
-                                    )}
-                                </div>
-                            )}
-
                             {/* Email field */}
                             <div className="mb-4">
                                 <label htmlFor="email" className="block text-gray-300 text-sm font-medium mb-2">
@@ -215,34 +177,6 @@ const LoginPage = () => {
                                     <p className="mt-1 text-sm text-red-400">{errors.email}</p>
                                 )}
                             </div>
-
-                            {/* Phone field (signup only) */}
-                            {!isLogin && (
-                                <div className="mb-4">
-                                    <label htmlFor="phone" className="block text-gray-300 text-sm font-medium mb-2">
-                                        Phone Number (Optional)
-                                    </label>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <Phone size={18} className="text-gray-500" />
-                                        </div>
-                                        <input
-                                            id="phone"
-                                            name="phone"
-                                            type="tel"
-                                            value={formData.phone}
-                                            onChange={handleChange}
-                                            className={`bg-gray-900 text-white w-full pl-10 pr-4 py-2 rounded-lg focus:ring-2 ${
-                                                errors.phone ? 'border border-red-500 focus:ring-red-500' : 'border border-gray-700 focus:ring-indigo-500'
-                                            }`}
-                                            placeholder="+1 (123) 456-7890"
-                                        />
-                                    </div>
-                                    {errors.phone && (
-                                        <p className="mt-1 text-sm text-red-400">{errors.phone}</p>
-                                    )}
-                                </div>
-                            )}
 
                             {/* Password field */}
                             <div className="mb-4">
@@ -331,37 +265,28 @@ const LoginPage = () => {
                                 </button>
                             </div>
 
-                            {/* Forgot Password (login only) */}
-                            {isLogin && (
-                                <div className="mt-4 text-center">
-                                    <a href="#forgot-password" className="text-indigo-300 hover:text-indigo-200 text-sm">
-                                        Forgot your password?
-                                    </a>
-                                </div>
-                            )}
+                            {/* Toggle between login and signup */}
+                            <div className="mt-6 pt-4 border-t border-gray-700 text-center">
+                                <p className="text-gray-400">
+                                    {isLogin ? "Don't have an account? " : "Already have an account? "}
+                                    <button
+                                        onClick={toggleMode}
+                                        className="text-indigo-300 hover:text-indigo-200 font-medium"
+                                    >
+                                        {isLogin ? "Sign Up" : "Sign In"}
+                                    </button>
+                                </p>
+                            </div>
+
+                            {/* OAuth options */}
+
                         </form>
-
-                        {/* Toggle between login and signup */}
-                        <div className="mt-6 pt-4 border-t border-gray-700 text-center">
-                            <p className="text-gray-400">
-                                {isLogin ? "Don't have an account? " : "Already have an account? "}
-                                <button
-                                    onClick={toggleMode}
-                                    className="text-indigo-300 hover:text-indigo-200 font-medium"
-                                >
-                                    {isLogin ? "Sign Up" : "Sign In"}
-                                </button>
-                            </p>
-                        </div>
-
-                        {/* OAuth options */}
-
                     </div>
                 </div>
 
             </div>
         </div>
     );
-};
+}; 
 
 export default LoginPage;

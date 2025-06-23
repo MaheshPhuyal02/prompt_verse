@@ -22,18 +22,13 @@ class AddressController extends Controller
             ->map(function ($address) {
                 return [
                     'id' => $address->id,
+                    'user_id' => $address->user_id,
                     'first_name' => $address->first_name,
                     'last_name' => $address->last_name,
-                    'full_name' => $address->full_name,
                     'phone' => $address->phone,
-                    'province' => $address->province,
-                    'district' => $address->district,
-                    'municipality' => $address->municipality,
-                    'ward' => $address->ward,
-                    'street_address' => $address->street_address,
-                    'complete_address' => $address->complete_address,
                     'is_default' => $address->is_default,
-                    'created_at' => $address->created_at,
+                    'full_name' => $address->first_name . ' ' . $address->last_name,
+                    'complete_address' => $address->full_name . ', ' . $address->phone,
                 ];
             });
 
@@ -52,12 +47,6 @@ class AddressController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'province' => 'required|string|max:255',
-            'district' => 'required|string|max:255',
-            'municipality' => 'required|string|max:255',
-            'ward' => 'required|integer|min:1|max:32',
-            'street_address' => 'required|string|max:255',
-            'is_default' => 'boolean',
         ]);
 
         DB::beginTransaction();
@@ -81,18 +70,13 @@ class AddressController extends Controller
                 'message' => 'Address added successfully',
                 'data' => [
                     'id' => $address->id,
+                    'user_id' => $address->user_id,
                     'first_name' => $address->first_name,
                     'last_name' => $address->last_name,
-                    'full_name' => $address->full_name,
                     'phone' => $address->phone,
-                    'province' => $address->province,
-                    'district' => $address->district,
-                    'municipality' => $address->municipality,
-                    'ward' => $address->ward,
-                    'street_address' => $address->street_address,
-                    'complete_address' => $address->complete_address,
                     'is_default' => $address->is_default,
-                    'created_at' => $address->created_at,
+                    'full_name' => $address->first_name . ' ' . $address->last_name,
+                    'complete_address' => $address->full_name . ', ' . $address->phone,
                 ]
             ], 201);
 
@@ -123,12 +107,6 @@ class AddressController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'province' => 'required|string|max:255',
-            'district' => 'required|string|max:255',
-            'municipality' => 'required|string|max:255',
-            'ward' => 'required|integer|min:1|max:32',
-            'street_address' => 'required|string|max:255',
-            'is_default' => 'boolean',
         ]);
 
         DB::beginTransaction();
@@ -147,18 +125,13 @@ class AddressController extends Controller
                 'message' => 'Address updated successfully',
                 'data' => [
                     'id' => $address->id,
+                    'user_id' => $address->user_id,
                     'first_name' => $address->first_name,
                     'last_name' => $address->last_name,
-                    'full_name' => $address->full_name,
                     'phone' => $address->phone,
-                    'province' => $address->province,
-                    'district' => $address->district,
-                    'municipality' => $address->municipality,
-                    'ward' => $address->ward,
-                    'street_address' => $address->street_address,
-                    'complete_address' => $address->complete_address,
                     'is_default' => $address->is_default,
-                    'created_at' => $address->created_at,
+                    'full_name' => $address->first_name . ' ' . $address->last_name,
+                    'complete_address' => $address->full_name . ', ' . $address->phone,
                 ]
             ]);
 

@@ -288,4 +288,35 @@ class PurchaseController extends Controller
             'data' => $stats
         ]);
     }
+
+    /**
+     * Get all purchases for the admin panel.
+     */
+    public function all(Request $request): JsonResponse
+    {
+        // In a real app, you'd want to add authorization to ensure only admins can access this.
+        // For example: if ($request->user()->cannot('view-all-purchases')) {
+        //   abort(403);
+        // }
+
+        $purchases = Purchase::with(['user', 'prompt'])->latest()->get();
+
+        $transformedPurchases = $purchases->map(function ($purchase) {
+            $promptData = $purchase->prompt ? [
+                'title' => $purchase->prompt->title,
+                'description' => $purchase->prompt->description,
+            ] : ($purchase->prompt_snapshot ?? ['title' => 'Unknown Prompt', 'description' => '']);
+
+            return [
+                'id' => $purchase->id,
+                'user' => $purchase->user ? $purchase->user->name : 'Unknown User',
+                'item' => $promptData['title'],
+                'amount' => $purchase->price_at_time,
+                'status' => $purchase->status,
+                'date' => $purchase->purchased_at ? $purchase->purchased_at->toFormattedDateString() : 'N/A',
+            ];
+        });
+
+        return response()->json($transformedPurchases);
+    }
 }

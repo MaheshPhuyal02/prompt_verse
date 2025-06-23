@@ -6,6 +6,8 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\PromptController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,22 +27,27 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/dashboard-stats', [DashboardController::class, 'stats']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/user', [AuthController::class, 'user']);
     Route::post('/file/upload', [FileController::class, 'saveFile']);
+    Route::get('/file', [FileController::class, 'index']);
+    Route::delete('/file/{fileId}', [FileController::class, 'destroy']);
+    Route::get('/admin/purchases', [PurchaseController::class, 'all']);
     Route::apiResource('purchases', PurchaseController::class);
     Route::apiResource('carts', CartController::class);
+    Route::apiResource('prompts', PromptController::class);
     Route::get('/get_button', [CartController::class, 'getKhaltiButton']);
     Route::get('/addresses', [AddressController::class, 'index']);
     Route::post('/addresses', [AddressController::class, 'store']);
     Route::put('/addresses/{address}', [AddressController::class, 'update']);
     Route::delete('/addresses/{address}', [AddressController::class, 'destroy']);
     Route::post('/addresses/{address}/default', [AddressController::class, 'setDefault']);
+    Route::get('/user/purchases', [ProfileController::class, 'purchases']);
 });
 
+// Public file access
 Route::get('/file/{fileId}', [FileController::class, 'getFile']);
-
-Route::apiResource('prompts', PromptController::class);
 
 // Khalti payment return URL - this should be public as Khalti will call it
 Route::get('/payment/success', [CartController::class, 'handleKhaltiReturn']);
