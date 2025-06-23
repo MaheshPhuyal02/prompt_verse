@@ -56,17 +56,13 @@ const MainApp = () => {
                             <Route
                                 path="/payment/success"
                                 element={
-                                    <ProtectedRoute>
-                                        <PaymentSuccessPage />
-                                    </ProtectedRoute>
+                                    <PaymentSuccessPage />
                                 }
                             />
                             <Route
                                 path="/payment/failed"
                                 element={
-                                    <ProtectedRoute>
-                                        <PaymentFailedPage />
-                                    </ProtectedRoute>
+                                    <PaymentFailedPage />
                                 }
                             />
                             <Route path="*" element={<Navigate to="/" />} />
