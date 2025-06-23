@@ -38,7 +38,7 @@ const PromptCard = ({ prompt }) => {
                 </div>
                 <p className="text-gray-400 text-sm line-clamp-2">{prompt.description}</p>
                 <div className="flex justify-between items-center pt-2">
-                    <span className="text-lg font-bold text-white">${prompt.price}</span>
+                    <span className="text-lg font-bold text-white">Rs{prompt.price}</span>
                     <button
                         onClick={() => onAddToCart(prompt)}
                         className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg text-sm transition-colors flex items-center"

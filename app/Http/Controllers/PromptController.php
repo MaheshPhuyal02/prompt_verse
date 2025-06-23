@@ -72,4 +72,9 @@ class PromptController extends Controller
 
         return response()->json(['message' => 'Prompt deleted']);
     }
+
+    public function allPrompts()
+    {
+        return Prompt::all(['id', 'title', 'rating', 'price', 'image', 'category', 'popular']);
+    }
 }

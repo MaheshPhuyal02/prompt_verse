@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/addresses/{address}', [AddressController::class, 'destroy']);
     Route::post('/addresses/{address}/default', [AddressController::class, 'setDefault']);
     Route::get('/user/purchases', [ProfileController::class, 'purchases']);
+    Route::get('/admin/all-prompts', [\App\Http\Controllers\PromptController::class, 'allPrompts']);
 });
 
 // Public file access

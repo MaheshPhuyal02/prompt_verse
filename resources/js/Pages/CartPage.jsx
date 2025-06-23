@@ -135,7 +135,7 @@ const CartPage = () => {
                                                             </span>
                                                             <span className="text-gray-400">|</span>
                                                             <span className="text-indigo-300 font-bold">
-                                                                Total: ${item.total_price}
+                                                                Total: Rs{item.total_price}
                                                             </span>
                                                         </div>
                                                         <div className="mt-1 text-sm text-gray-400">
@@ -165,7 +165,7 @@ const CartPage = () => {
                                                     </div>
                                                     <div className="flex justify-between items-center text-2xl font-bold text-indigo-300">
                                                         <span>Total Amount</span>
-                                                        <span>${cartData.summary.total_amount}</span>
+                                                        <span>Rs{cartData.summary.total_amount}</span>
                                                     </div>
                                                 </div>
 

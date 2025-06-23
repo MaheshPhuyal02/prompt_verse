@@ -396,7 +396,7 @@
             document.getElementById('totalUsersStat').textContent = stats.total_users;
             document.getElementById('activePromptsStat').textContent = stats.active_prompts;
             document.getElementById('filesUploadedStat').textContent = stats.files_uploaded;
-            document.getElementById('totalRevenueStat').textContent = `$${stats.total_revenue}`;
+            document.getElementById('totalRevenueStat').textContent = `Rs${stats.total_revenue}`;
 
             hideLoading();
             log('Dashboard data loaded successfully');
@@ -457,7 +457,7 @@
     async function loadPrompts() {
         log('Loading prompts data');
         try {
-            const prompts = await apiCall('/prompts');
+            const prompts = await apiCall('/admin/all-prompts');
             log('Prompts API response received', prompts);
 
             const promptsList = document.getElementById('promptsList');
@@ -591,7 +591,7 @@
                     <tr>
                         <td class="px-6 py-4 text-sm text-gray-300">${purchase.user || 'Unknown User'}</td>
                         <td class="px-6 py-4 text-sm text-gray-300">${purchase.item || 'Unknown Item'}</td>
-                        <td class="px-6 py-4 text-sm text-gray-300">$${(purchase.amount || 0)}</td>
+                        <td class="px-6 py-4 text-sm text-gray-300">Rs${(purchase.amount || 0)}</td>
                         <td class="px-6 py-4 text-sm">
                             <span class="px-2 py-1 text-xs rounded-full ${getStatusClass(purchase.status)}">
                                 ${purchase.status || 'Unknown'}

@@ -189,7 +189,7 @@ const ProfilePage = () => {
                                                                 </div>
                                                                 <div className="flex items-center text-green-400">
                                                                     <DollarSign size={16} className="mr-1" />
-                                                                    <span className="text-sm">${prompt.price}</span>
+                                                                    <span className="text-sm">Rs{prompt.price}</span>
                                                                 </div>
                                                                 <div className="flex items-center text-purple-300">
                                                                     <Tag size={16} className="mr-1" />
@@ -283,7 +283,7 @@ const ProfilePage = () => {
                                 </div>
                                 <div className="flex items-center px-3 py-2 rounded-lg bg-green-900/30 text-green-400">
                                     <DollarSign size={16} className="mr-2" />
-                                    <span className="text-sm">${selectedPrompt.price}</span>
+                                    <span className="text-sm">Rs{selectedPrompt.price}</span>
                                 </div>
                                 <div className="flex items-center px-3 py-2 rounded-lg bg-purple-900/30 text-purple-300">
                                     <Tag size={16} className="mr-2" />

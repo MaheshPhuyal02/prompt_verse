@@ -41,7 +41,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-400 text-sm">Total Revenue</p>
-                    <p class="text-3xl font-bold text-yellow-400" id="totalRevenueStat">$0</p>
+                    <p class="text-3xl font-bold text-yellow-400" id="totalRevenueStat">Rs0</p>
                 </div>
                 <i class="fas fa-dollar-sign text-3xl text-yellow-400 opacity-50"></i>
             </div>
